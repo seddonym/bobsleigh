@@ -49,11 +49,12 @@ class InstallationHandler(object):
                                                                 self.logpath
         self._settings['DATABASES']['default']['NAME'] = self.db_name
         self._settings['DATABASES']['default']['USER'] = self.db_user
+        self._settings['ALLOWED_HOSTS'] = [self.domain]
 
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
         self._settings['DATABASES']['default']['PASSWORD'] = secret['DB_PASS']
-        self._settings['ALLOWED_HOSTS'] = [self.domain]
+        self._settings['SECRET_KEY'] = secret['SECRET_KEY']
         return settings
 
     def is_current(self):
