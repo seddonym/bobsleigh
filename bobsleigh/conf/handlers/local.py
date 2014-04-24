@@ -12,6 +12,9 @@ class LocalHandler(InstallationHandler):
         self.domain = "%s.localhost" % self.sitename
         self.logpath = '/var/log/django/%s/debug.log' % self.sitename
         self.db_user = self.db_name = self.sitename
+        var_root = '/home/david/var/www/%s' % self.sitename
+        self.static_root = '%s/static' % var_root
+        self.media_root = '%s/uploads' % var_root
 
     def is_current(self):
         return self.host == socket.gethostname()

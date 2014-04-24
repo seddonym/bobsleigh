@@ -51,6 +51,9 @@ class InstallationHandler(object):
         self._settings['DATABASES']['default']['USER'] = self.db_user
         self._settings['ALLOWED_HOSTS'] = [self.domain]
 
+        self._settings['STATIC_ROOT'] = self.static_root
+        self._settings['MEDIA_ROOT'] = self.media_root
+
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
         self._settings['DATABASES']['default']['PASSWORD'] = secret['DB_PASS']

@@ -10,8 +10,10 @@ class WebfactionHandler(InstallationHandler):
         self.webfaction_user = webfaction_user
         self.domain = domain
         self.server_email = server_email
-
         super(WebfactionHandler, self).__init__(sitename=sitename)
+        webapps_path = '/home/%s/webapps' % webfaction_user
+        self.static_root = '%s/%s_static' % (webapps_path, sitename)
+        self.media_root = '%s/%s_uploads' % (webapps_path, sitename)
 
     def is_current(self):
         if self.host == socket.gethostname():
@@ -27,7 +29,6 @@ class WebfactionHandler(InstallationHandler):
 
 class DevHandler(WebfactionHandler):
     default_debug = True
-
 
 class LiveHandler(WebfactionHandler):
     pass
