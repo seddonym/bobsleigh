@@ -5,7 +5,7 @@ import socket
 class WebfactionHandler(InstallationHandler):
 
     def __init__(self, sitename, host, webfaction_user,
-                 domain, server_email):
+                 domain, server_email, prefix=None):
         self.host = host
         self.webfaction_user = webfaction_user
         self.domain = domain
@@ -15,15 +15,23 @@ class WebfactionHandler(InstallationHandler):
         self.static_root = '%s/%s_static' % (webapps_path, sitename)
         self.media_root = '%s/%s_uploads' % (webapps_path, sitename)
 
+        self.logpath = '/home/%s/logs/user/%s/django-error.log' \
+                            % (self.webfaction_user, self.sitename)
+
+        if prefix:
+            prefixed_name = '%s_%s' % (prefix, self.sitename)
+        else:
+            prefixed_name = self.sitename
+        self.db_user = self.db_name = prefixed_name
+
+
     def is_current(self):
         if self.host == socket.gethostname():
-            # Check if project path matches
-            project_path = '/'.join(__file__.split('/')[:-4])
-            handler_project_path = '/home/%s/webapps/%s' % \
+            # Check if virtualenv matches
+            virtualenv_path = '/'.join(__file__.split('/')[:5])
+            handler_virtualenv_path = '/home/%s/.virtualenvs/%s' % \
                                 (self.webfaction_user, self.sitename)
-            print project_path
-            print handler_project_path
-            return project_path == handler_project_path
+            return virtualenv_path == handler_virtualenv_path
         return False
 
 
