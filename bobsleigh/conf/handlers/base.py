@@ -22,10 +22,11 @@ class InstallationHandler(object):
 
     def setup(self):
         "Sets up the settings for Django."
-        settings.configure(**self.get_settings())
+        if not settings.configured:
+            settings.configure(**self.get_settings())
 
     def get_settings(self):
-        "Returns dictionary of all the settings."
+        "Returns dictionary of all the settings."base.
 
         if not self._settings:
             self.build_settings()
@@ -54,11 +55,13 @@ class InstallationHandler(object):
         self._settings['STATIC_ROOT'] = self.static_root
         self._settings['MEDIA_ROOT'] = self.media_root
 
+        self._settings['DOMAIN'] = self.domain
+
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
         self._settings['DATABASES']['default']['PASSWORD'] = secret['DB_PASS']
         self._settings['SECRET_KEY'] = secret['SECRET_KEY']
-        return settings
+
 
     def is_current(self):
         """Returns whether or not to treat this handler as the correct
