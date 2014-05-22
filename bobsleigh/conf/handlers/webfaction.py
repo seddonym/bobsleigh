@@ -34,6 +34,10 @@ class WebfactionHandler(InstallationHandler):
             return virtualenv_path == handler_virtualenv_path
         return False
 
+    def get_virtualenv(self):
+        return '/home/%s/.virtualenvs/%s' % (self.webfaction_user,
+                                             self.sitename)
+
 
 class DevHandler(WebfactionHandler):
     default_debug = True
