@@ -26,7 +26,7 @@ class InstallationHandler(object):
             settings.configure(**self.get_settings())
 
     def get_settings(self):
-        "Returns dictionary of all the settings."base.
+        "Returns dictionary of all the settings."
 
         if not self._settings:
             self.build_settings()
