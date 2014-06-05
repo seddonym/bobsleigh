@@ -30,7 +30,7 @@ class VagrantHandler(InstallationHandler):
     host = 'precise32'
 
     def __init__(self, *args, **kwargs):
-        super(LocalHandler, self).__init__(*args, **kwargs)
+        super(VagrantHandler, self).__init__(*args, **kwargs)
         self.domain = "%s.vagrant" % self.sitename
         self.logpath = '/var/log/django/debug.log'
         self.db_user = self.db_name = self.sitename
