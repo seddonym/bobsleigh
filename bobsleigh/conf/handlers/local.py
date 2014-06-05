@@ -21,3 +21,24 @@ class LocalHandler(InstallationHandler):
 
     def get_virtualenv(self):
         return '/home/david/.virtualenvs/%s' % self.sitename
+
+
+class VagrantHandler(InstallationHandler):
+
+    monitor = True
+    default_debug = True
+    host = 'precise32'
+
+    def __init__(self, *args, **kwargs):
+        super(LocalHandler, self).__init__(*args, **kwargs)
+        self.domain = "%s.vagrant" % self.sitename
+        self.logpath = '/var/log/django/debug.log'
+        self.db_user = self.db_name = self.sitename
+        self.static_root = '/opt/site/static'
+        self.media_root = '/opt/site/uploads'
+
+    def is_current(self):
+        return self.host == socket.gethostname()
+
+    def get_virtualenv(self):
+        return '/opt/site/.virtualenvs/site'
