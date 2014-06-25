@@ -46,6 +46,9 @@ class InstallationHandler(object):
         "Adjusts the settings"
         # Adjust settings
         self._settings['DEBUG'] = self.debug
+        self._settings['TEMPLATE_DEBUG'] = self.debug
+        self._settings['THUMBNAIL_DEBUG'] = self.debug
+
         self._settings['LOGGING']['handlers']['error']['filename'] = \
                                                                 self.logpath
         self._settings['DATABASES']['default']['NAME'] = self.db_name
