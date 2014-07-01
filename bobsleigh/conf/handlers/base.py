@@ -1,5 +1,7 @@
 from django.conf import settings
 from importlib import import_module
+import os
+
 
 def settings_from_module(module):
     "Returns settings defined in a module as a dictionary."
@@ -59,6 +61,8 @@ class InstallationHandler(object):
         self._settings['MEDIA_ROOT'] = self.media_root
         self._settings['DOMAIN'] = self.domain
         self._settings['PROJECT_ROOT'] = self.project_root
+        self._settings['TEMPLATE_DIRS'] = (os.path.join(self.project_root,
+                                                        'templates'),)
 
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
