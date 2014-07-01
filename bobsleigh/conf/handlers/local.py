@@ -15,6 +15,7 @@ class LocalHandler(InstallationHandler):
         var_root = '/home/david/var/www/%s' % self.sitename
         self.static_root = '%s/static' % var_root
         self.media_root = '%s/uploads' % var_root
+        self.project_root = '/home/david/www/%s' % self.sitename
 
     def is_current(self):
         return self.host == socket.gethostname()

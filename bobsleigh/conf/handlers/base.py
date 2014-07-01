@@ -57,8 +57,8 @@ class InstallationHandler(object):
 
         self._settings['STATIC_ROOT'] = self.static_root
         self._settings['MEDIA_ROOT'] = self.media_root
-
         self._settings['DOMAIN'] = self.domain
+        self._settings['PROJECT_ROOT'] = self.project_root
 
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
