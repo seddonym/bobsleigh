@@ -14,7 +14,7 @@ class WebfactionHandler(InstallationHandler):
         webapps_path = '/home/%s/webapps' % webfaction_user
         self.static_root = '%s/%s_static' % (webapps_path, sitename)
         self.media_root = '%s/%s_uploads' % (webapps_path, sitename)
-        self.project_root = '%s/%s/%s' % (webapps_path, sitename, sitename)
+        self.project_root = '%s/%s/django' % (webapps_path, sitename)
         self.logpath = '/home/%s/logs/user/%s/django-error.log' \
                             % (self.webfaction_user, self.sitename)
 
