@@ -52,7 +52,9 @@ class InstallationHandler(object):
         self._settings['THUMBNAIL_DEBUG'] = self.debug
 
         self._settings['LOGGING']['handlers']['error']['filename'] = \
-                                                                self.logpath
+                                                '%s/error.log' % self.logpath
+        self._settings['LOGGING']['handlers']['debug']['filename'] = \
+                                                '%s/debug.log' % self.logpath
         self._settings['DATABASES']['default']['NAME'] = self.db_name
         self._settings['DATABASES']['default']['USER'] = self.db_user
         self._settings['ALLOWED_HOSTS'] = [self.domain]
@@ -67,8 +69,7 @@ class InstallationHandler(object):
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
         self._settings['DATABASES']['default']['PASSWORD'] = secret['DB_PASS']
-        self._settings['SECRET_KEY'] = secret['SECRET_KEY']
-
+        self._settings.update(settings_from_module(secret))
 
     def is_current(self):
         """Returns whether or not to treat this handler as the correct

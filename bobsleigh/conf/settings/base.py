@@ -68,7 +68,15 @@ LOGGING = {
         'error': {
             'level':'ERROR',
             'class':'logging.handlers.RotatingFileHandler',
-            # 'filename': LOG_PATH, - filled in by handler
+            # 'filename': ERROR_LOG_PATH, - filled in by handler
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'standard',
+        },
+        'debug': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            # 'filename': DEBUG_LOG_PATH, - filled in by handler
             'maxBytes': 50000,
             'backupCount': 2,
             'formatter': 'standard',
@@ -89,6 +97,11 @@ LOGGING = {
             'handlers': ['mail_admins', 'error'],
             'level': 'ERROR',
             'propagate': False,
+        },
+        'project': {
+            'handlers':['debug'],
+            'propagate': True,
+            'level':'DEBUG',
         },
     }
 }
