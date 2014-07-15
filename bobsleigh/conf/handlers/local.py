@@ -37,6 +37,7 @@ class VagrantHandler(InstallationHandler):
         self.db_user = self.db_name = self.sitename
         self.static_root = '/opt/site/static'
         self.media_root = '/opt/site/uploads'
+        self.project_root = '/opt/site/django'
 
     def is_current(self):
         return self.host == socket.gethostname()
