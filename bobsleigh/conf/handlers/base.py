@@ -69,7 +69,7 @@ class InstallationHandler(object):
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
         self._settings['DATABASES']['default']['PASSWORD'] = secret['DB_PASS']
-        self._settings.update(settings_from_module(secret))
+        self._settings.update(secret)
 
     def is_current(self):
         """Returns whether or not to treat this handler as the correct
