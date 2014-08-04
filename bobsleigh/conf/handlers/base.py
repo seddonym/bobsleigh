@@ -66,6 +66,13 @@ class InstallationHandler(object):
         self._settings['TEMPLATE_DIRS'] = (os.path.join(self.project_root,
                                                         'templates'),)
 
+        self._settings['EMAIL_HOST'] = getattr(self, 'email_host', '')
+        self._settings['EMAIL_HOST_USER'] = getattr(self, 'email_host_user',
+                                                    '')
+        self._settings['SERVER_EMAIL'] = getattr(self, 'server_email', '')
+        self._settings['DEFAULT_FROM_EMAIL'] = getattr(self, 'server_email',
+                                                    '')
+
         # Secret settings
         secret = settings_from_module(import_module('settings.secret'))
         self._settings['DATABASES']['default']['PASSWORD'] = secret['DB_PASS']

@@ -24,6 +24,8 @@ class WebfactionHandler(InstallationHandler):
             prefixed_name = self.sitename
         self.db_user = self.db_name = prefixed_name
 
+        self.email_host = 'smtp.webfaction.com'
+        self.email_host_user = prefixed_name
 
     def is_current(self):
         if self.host == socket.gethostname():
