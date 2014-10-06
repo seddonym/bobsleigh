@@ -1,2 +1,8 @@
 .project
 .pydevproject
+.gitignore
+*.pyc
+*.egg-info
+dist
+build
+

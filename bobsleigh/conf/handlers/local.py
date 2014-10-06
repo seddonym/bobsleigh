@@ -1,4 +1,4 @@
-from base import InstallationHandler
+from .base import InstallationHandler
 import socket
 
 class LocalHandler(InstallationHandler):
