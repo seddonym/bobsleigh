@@ -32,6 +32,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 )
 
+MIDDLEWARE_CLASSES = [
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+]
 
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
