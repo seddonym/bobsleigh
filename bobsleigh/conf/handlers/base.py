@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from importlib import import_module
 import os
+import socket
 
 
 def settings_from_module(module):
@@ -53,12 +54,16 @@ class BaseInstallationHandler(object):
                         InstallationHandler." % kwarg)
 
         # Combine with optional kwargs
-        combined_kwargs = kwargs.copy()
-        combined_kwargs.update(self.optional_kwargs)
+        combined_kwargs = self.optional_kwargs.copy()
 
-        # Use patterns to fill in any config attributes that
-        # depend on a pattern
+        # Use patterns to fill in/override any config attributes that
+        # define a pattern
+        for key, pattern in self.patterns.items():
+            combined_kwargs[key] = pattern % combined_kwargs
 
+
+        # Ensure the provided kwargs override anything specified by the class
+        combined_kwargs.update(self.kwargs)
 
         # Sets the dict as an object, just
         # so we can access it as attributes instead of keys
@@ -99,10 +104,6 @@ class BaseInstallationHandler(object):
         one for the installation."""
         raise NotImplementedError
 
-    def get_virtualenv(self):
-        "Returns the path to the virtualenv, if there is one."
-        raise NotImplementedError
-
 
 class InstallationHandler(BaseInstallationHandler):
     "Standard installation handler with likely defaults."
@@ -119,6 +120,14 @@ class InstallationHandler(BaseInstallationHandler):
         'server_email': None,
         'db_name': None,
         'db_user': None,
+        # Whether or not to monitor the codebase for changes
+        'monitor': False,
+        # The path to the virtualenv, if there is one.
+        'virtualenv': None,
+        # The name of the python version.  This is used by some runners
+        # to locate, for example, the virtualenv's sitepackages
+        'python': 'python2.7',
+
     }
 
     # Specify some patterns - these should be filled in by

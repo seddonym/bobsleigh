@@ -13,17 +13,18 @@ def wsgi_environment():
     "Sets up the wsgi environment."
     handler.setup()
 
-    virtualenv = handler.get_virtualenv()
+    virtualenv = handler.config.virtualenv
     if virtualenv:
         # This makes sure the virtualenv is activated
         # for any virtualenv environments
         import os
         import site
-        site.addsitedir(os.path.join(virtualenv, 'lib/python2.7/site-packages'))
+        site.addsitedir(os.path.join(virtualenv, 'lib/%s/site-packages'
+                                                    % handler.config.python))
         activate_this = os.path.join(virtualenv, 'bin/activate_this.py')
         execfile(activate_this, dict(__file__=activate_this))
 
-    if handler.monitor:
+    if handler.config.monitor:
         import monitor
         monitor.start(interval=1.0)
 
