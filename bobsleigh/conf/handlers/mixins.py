@@ -16,8 +16,8 @@ class LocalHandlerMixin(object):
     }
 
 
-
 class DevHandlerMixin(object):
+    "Mixin for installation handlers geared up to development installations."
     optional_kwargs = {
         'debug': True,
         'email_host': None,
@@ -27,5 +27,3 @@ class DevHandlerMixin(object):
         'db_user': None,
         'monitor': False,
     }
-
-

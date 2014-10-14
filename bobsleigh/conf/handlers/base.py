@@ -26,48 +26,53 @@ class BaseInstallationHandler(object):
     # The name of the project settings file, for importing
     project_module = ''
 
-    # Required instantiation kwargs.
-    # Will be set as attributes on the instance.
-    required_kwargs = ()
-
-    # Optional instantiation kwargs.
-    # Will be set as attributes on the instance, if present, otherwise
-    # the default value will be used.
-    optional_kwargs = {}
-
-    # Define a dictionary of patterns that can be used to
-    # set config variables based on other config variables.
-    #
-    # For example, the following line will set self.config.project_root
-    # based on self.config.user and self.config.sitename.
-    #
-    # patterns = {
-    #     'project_root': '/home/%(user)s/sites/%(sitename)s'
-    # }
-    patterns = {}
-
     def __init__(self, **kwargs):
         # Check the required kwargs are there
-        for kwarg in self.required_kwargs:
+        required_kwargs = self.get_required_kwargs()
+        for kwarg in required_kwargs:
             if kwarg not in kwargs:
-                raise ImproperlyConfigured("Required kwarg '%s' missing from \
-                        InstallationHandler." % kwarg)
+                raise ImproperlyConfigured("Required kwarg '%s' missing from" \
+                        " InstallationHandler %s." % (kwarg, self))
 
         # Combine with optional kwargs
-        combined_kwargs = self.optional_kwargs.copy()
+        combined_kwargs = self.get_optional_kwargs().copy()
+        combined_kwargs.update(kwargs)
 
         # Use patterns to fill in/override any config attributes that
         # define a pattern
-        for key, pattern in self.patterns.items():
+        for key, pattern in self.get_config_patterns().items():
             combined_kwargs[key] = pattern % combined_kwargs
 
-
-        # Ensure the provided kwargs override anything specified by the class
-        combined_kwargs.update(self.kwargs)
+        # Repeat dict update to ensure the provided kwargs
+        # override anything specified by the class
+        combined_kwargs.update(kwargs)
 
         # Sets the dict as an object, just
         # so we can access it as attributes instead of keys
         self.config = type('InstallationHandlerConfig', (), combined_kwargs)
+
+    def get_required_kwargs(self):
+        # Returns a tuple of required instantiation kwargs.
+        # Will be set as attributes on self.config
+        return ()
+
+    def get_optional_kwargs(self):
+        # Returns a dict of optional instantiation kwargs, with their defaults.
+        # Will be set as attributes on self.config, if present.
+        return {}
+
+    def get_config_patterns(self):
+        """Returns a dictionary of patterns that can be used to
+        set config variables based on other config variables.
+
+        For example, the following line will set self.config.project_path
+        based on self.config.user and self.config.sitename.
+
+        patterns = {
+             'project_path': '/home/%(user)s/sites/%(sitename)s'
+        }
+        """
+        return {}
 
     def setup(self):
         "Sets up the settings for Django."
@@ -77,7 +82,7 @@ class BaseInstallationHandler(object):
     def get_settings(self):
         "Returns dictionary of all the settings."
 
-        if not self._settings:
+        if not getattr(self, '_settings', None):
             self.build_settings()
         return self._settings
 
@@ -110,48 +115,53 @@ class InstallationHandler(BaseInstallationHandler):
 
     project_module = 'settings.project'
 
-    required_kwargs = ('sitename',
-                       'domain')
+    def get_required_kwargs(self):
+        return ('sitename', 'domain', 'host')
 
-    optional_kwargs = {
-        'debug': False,
-        'email_host': None,
-        'email_host_user': None,
-        'server_email': None,
-        'db_name': None,
-        'db_user': None,
-        # Whether or not to monitor the codebase for changes
-        'monitor': False,
-        # The path to the virtualenv, if there is one.
-        'virtualenv': None,
-        # The name of the python version.  This is used by some runners
-        # to locate, for example, the virtualenv's sitepackages
-        'python': 'python2.7',
+    def get_optional_kwargs(self):
+        return {
+            'debug': False,
+            'email_host': None,
+            'email_host_user': None,
+            'server_email': None,
+            'db_name': None,
+            'db_user': None,
+            # Whether or not to monitor the codebase for changes
+            'monitor': False,
+            # The path to the virtualenv, if there is one.
+            'virtualenv': None,
+            # The name of the python version.  This is used by some runners
+            # to locate, for example, the virtualenv's sitepackages
+            'python': 'python2.7',
+        }
 
-    }
-
-    # Specify some patterns - these should be filled in by
-    # classes extending this.
-    patterns = {
-        'static_root': '',
-        'media_root': '',
-        'project_root': '',
-        'logpath': '',
-    }
+    def get_config_patterns(self):
+        # Specify some patterns - these should be filled in by
+        # classes extending this.
+        return {
+            'static_path': '',
+            'media_path': '',
+            'project_path': '',
+            'log_path': '',
+        }
 
     def adjust(self):
         "Adjusts the settings"
         super(InstallationHandler, self).adjust()
+
         self.adjust_debug()
+        self.adjust_logging()
+        self.adjust_databases()
+        self.adjust_email()
 
         self._settings['ALLOWED_HOSTS'] = [self.config.domain]
         self._settings['DOMAIN'] = self.config.domain
-        self._settings['STATIC_ROOT'] = self.config.static_root
-        self._settings['MEDIA_ROOT'] = self.config.media_root
+        self._settings['STATIC_ROOT'] = self.config.static_path
+        self._settings['MEDIA_ROOT'] = self.config.media_path
 
-        self._settings['PROJECT_ROOT'] = self.config.project_root
+        self._settings['PROJECT_ROOT'] = self.config.project_path
         self._settings['TEMPLATE_DIRS'] = (os.path.join(
-                                            self.config.project_root,
+                                            self.config.project_path,
                                             'templates'),)
 
     def adjust_debug(self):
@@ -163,9 +173,9 @@ class InstallationHandler(BaseInstallationHandler):
     def adjust_logging(self):
         "Adjusts logging settings"
         self._settings['LOGGING']['handlers']['error']['filename'] = \
-                                os.path.join(self.config.logpath, 'error.log')
+                                os.path.join(self.config.log_path, 'error.log')
         self._settings['LOGGING']['handlers']['debug']['filename'] = \
-                                os.path.join(self.config.logpath, 'debug.log')
+                                os.path.join(self.config.log_path, 'debug.log')
 
     def adjust_databases(self):
         "Adjusts database settings"
@@ -176,7 +186,7 @@ class InstallationHandler(BaseInstallationHandler):
                                                     self.config.db_user
             try:
                 self._settings['DATABASES']['default']['PASSWORD'] = \
-                                                    self._secret['DB_PASS']
+                                                    self._settings['DB_PASS']
             except KeyError:
                 raise ImproperlyConfigured('You must define a DB_PASS \
                                             setting in your secret.py.')
@@ -188,3 +198,8 @@ class InstallationHandler(BaseInstallationHandler):
         self._settings['SERVER_EMAIL'] = self.config.server_email
         self._settings['DEFAULT_FROM_EMAIL'] = self.config.server_email
 
+    def is_current(self):
+        """Basic way of testing whether or not this is the current
+        installationhandler.  This won't work for situations where
+        multiple instances run on the same host."""
+        return self.config.host == socket.gethostname()
