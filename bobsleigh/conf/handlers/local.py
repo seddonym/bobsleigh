@@ -1,6 +1,7 @@
 from .base import InstallationHandler
 import socket
 
+
 class LocalHandler(InstallationHandler):
 
     monitor = True
