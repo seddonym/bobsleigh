@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 setup(
     name='bobsleigh',
-    version='1.0',
+    version='1.0-alpha',
     url='http://github.com/seddonym/bobsleigh/',
     author='David Seddon',
     author_email='david@seddonym.me',
