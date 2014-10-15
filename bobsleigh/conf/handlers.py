@@ -40,12 +40,10 @@ class BaseInstallationHandler(object):
 
         # Use patterns to fill in/override any config attributes that
         # define a pattern
-        for key, pattern in self.get_config_patterns().items():
-            combined_kwargs[key] = pattern % combined_kwargs
-
-        # Repeat dict update to ensure the provided kwargs
-        # override anything specified by the class
-        combined_kwargs.update(kwargs)
+        for key, pattern in self.get_config_patterns():
+            if key not in kwargs:
+                # Only override it if they were not passed in as kwargs
+                combined_kwargs[key] = pattern % combined_kwargs
 
         # Sets the dict as an object, just
         # so we can access it as attributes instead of keys
@@ -64,17 +62,18 @@ class BaseInstallationHandler(object):
         }
 
     def get_config_patterns(self):
-        """Returns a dictionary of patterns that can be used to
-        set config variables based on other config variables.
+        """Returns a tuple of two-tuples containing patterns
+        that can be used to set config variables based on other
+        config variables.
 
         For example, the following line will set self.config.project_path
         based on self.config.user and self.config.sitename.
 
-        patterns = {
-             'project_path': '/home/%(user)s/sites/%(sitename)s'
-        }
+        patterns = (
+             ('project_path', '/home/%(user)s/sites/%(sitename)s'),
+        )
         """
-        return {}
+        return ()
 
     def setup(self):
         "Sets up the settings for Django."
@@ -154,12 +153,12 @@ class InstallationHandler(BaseInstallationHandler):
         """Specify some patterns - these should be filled in by
         classes extending this."""
         patterns = super(InstallationHandler, self).get_config_patterns()
-        patterns.update({
-            'static_path': '',
-            'media_path': '',
-            'project_path': '',
-            'log_path': '',
-        })
+        patterns += (
+            ('static_path', ''),
+            ('media_path', ''),
+            ('project_path', ''),
+            ('log_path', ''),
+        )
         return patterns
 
     def adjust(self):

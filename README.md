@@ -197,7 +197,7 @@ For example, this installation handler would allow a 'host' kwarg, setting it to
 get_config_patterns()
 ---------------------
 
-This powerful method returns a dictionary of string patterns, keyed with the name of the config attribute that it should be used for.  It allows you to use other config attributes to form new ones.
+This powerful method returns a tuple of two-tuples, with the name of the config attribute and a string pattern.  It allows you to use other config attributes to form new ones.
 
 For example, this installation handler would specify the project_path based on the domain kwarg.
 
@@ -206,9 +206,9 @@ For example, this installation handler would specify the project_path based on t
         def get_config_patterns(self):
             patterns = super(InstallationHandler, self)\
                                                         .get_config_patterns()
-            patterns.update({
-                'project_path': '/opt/sites/%(domain)s',
-            })
+            patterns. += (
+                ('project_path', '/opt/sites/%(domain)s'),
+            )
             return patterns
 
 adjust()
