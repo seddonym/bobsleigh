@@ -43,15 +43,16 @@ File structure
 
 The file structure of a Bobsleigh project should be as follows:
    
-   myproject
-       - manage.py
-       - wsgi.py
-       settings
-           - __init__.py
-           - project.py
-           - installations.py
-           - secret.py
-       (other packages, files etc. as normal)
+       myproject
+           __init__.py
+           manage.py
+           wsgi.py
+           settings
+               __init__.py
+               project.py
+               installations.py
+               secret.py
+           (other packages, files etc. as normal)
 
 The project.py file
 -------------------
@@ -71,7 +72,7 @@ The secret.py file
 
 This is also a normal settings file, but should be used for anything sensitive that should not be put in version control.  It will be automatically imported.
 
-To set the database password, specify `DB_PASS`, and this will automatically be added to the DATABASES['default']['PASSWORD'] setting.
+To set the database password, specify `DB_PASS`, and this will automatically be added to the `DATABASES['default']['PASSWORD']` setting.
 
 The installations.py file
 -------------------------
