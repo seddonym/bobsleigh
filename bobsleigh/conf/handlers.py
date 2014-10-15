@@ -59,7 +59,9 @@ class BaseInstallationHandler(object):
     def get_optional_kwargs(self):
         # Returns a dict of optional instantiation kwargs, with their defaults.
         # Will be set as attributes on self.config, if present.
-        return {}
+        return {
+            'extra_settings': {},
+        }
 
     def get_config_patterns(self):
         """Returns a dictionary of patterns that can be used to
@@ -81,12 +83,13 @@ class BaseInstallationHandler(object):
 
     def get_settings(self):
         "Returns dictionary of all the settings."
-
         if not getattr(self, '_settings', None):
             self.build_settings()
         return self._settings
 
     def build_settings(self):
+        """Builds the settings into self._settings,
+        and makes any adjustments."""
         self.import_initial()
         self.adjust()
 
@@ -98,11 +101,13 @@ class BaseInstallationHandler(object):
 
     def adjust(self):
         "Adjusts the settings"
-
         # Pull any secret settings from the secret module
         # This file should not be in the main code repository
         secret = settings_from_module(import_module('settings.secret'))
         self._settings.update(secret)
+
+        # Process the extra_settings kwarg
+        self._settings.update(self.config.extra_settings)
 
     def is_current(self):
         """Returns whether or not to treat this handler as the correct
@@ -116,10 +121,15 @@ class InstallationHandler(BaseInstallationHandler):
     project_module = 'settings.project'
 
     def get_required_kwargs(self):
-        return ('sitename', 'domain', 'host')
+        required_kwargs = super(InstallationHandler, self)\
+                                                    .get_required_kwargs()
+        required_kwargs += ('domain', 'host')
+        return required_kwargs
 
     def get_optional_kwargs(self):
-        return {
+        optional_kwargs = super(InstallationHandler, self)\
+                                                    .get_optional_kwargs()
+        optional_kwargs.update({
             'debug': False,
             'email_host': None,
             'email_host_user': None,
@@ -129,21 +139,28 @@ class InstallationHandler(BaseInstallationHandler):
             # Whether or not to monitor the codebase for changes
             'monitor': False,
             # The path to the virtualenv, if there is one.
-            'virtualenv': None,
+            'virtualenv_path': None,
             # The name of the python version.  This is used by some runners
             # to locate, for example, the virtualenv's sitepackages
             'python': 'python2.7',
-        }
+            'static_path': None,
+            'media_path': None,
+            'project_path': None,
+            'log_path': None,
+        })
+        return optional_kwargs
 
     def get_config_patterns(self):
-        # Specify some patterns - these should be filled in by
-        # classes extending this.
-        return {
+        """Specify some patterns - these should be filled in by
+        classes extending this."""
+        patterns = super(InstallationHandler, self).get_config_patterns()
+        patterns.update({
             'static_path': '',
             'media_path': '',
             'project_path': '',
             'log_path': '',
-        }
+        })
+        return patterns
 
     def adjust(self):
         "Adjusts the settings"
