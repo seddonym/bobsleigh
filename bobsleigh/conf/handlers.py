@@ -192,6 +192,13 @@ class InstallationHandler(BaseInstallationHandler):
                                 os.path.join(self.config.log_path, 'error.log')
         self._settings['LOGGING']['handlers']['debug']['filename'] = \
                                 os.path.join(self.config.log_path, 'debug.log')
+        # Make sure we don't bother to mail admins if debug is True
+        if self.config.debug:
+            try:
+                self._settings['LOGGING']['loggers']['django.request']\
+                                            ['handlers'].remove('mail_admins')
+            except (KeyError, ValueError):
+                pass
 
     def adjust_databases(self):
         "Adjusts database settings"
