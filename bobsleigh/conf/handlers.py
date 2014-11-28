@@ -163,12 +163,6 @@ class InstallationHandler(BaseInstallationHandler):
 
     def adjust(self):
         "Adjusts the settings"
-        super(InstallationHandler, self).adjust()
-
-        self.adjust_debug()
-        self.adjust_logging()
-        self.adjust_databases()
-        self.adjust_email()
 
         self._settings['ALLOWED_HOSTS'] = [self.config.domain]
         self._settings['DOMAIN'] = self.config.domain
@@ -179,6 +173,13 @@ class InstallationHandler(BaseInstallationHandler):
         self._settings['TEMPLATE_DIRS'] = (os.path.join(
                                             self.config.project_path,
                                             'templates'),)
+        self.adjust_debug()
+        self.adjust_logging()
+        self.adjust_databases()
+        self.adjust_email()
+
+        super(InstallationHandler, self).adjust()
+
 
     def adjust_debug(self):
         "Adjusts settings based on debug value"
@@ -192,6 +193,13 @@ class InstallationHandler(BaseInstallationHandler):
                                 os.path.join(self.config.log_path, 'error.log')
         self._settings['LOGGING']['handlers']['debug']['filename'] = \
                                 os.path.join(self.config.log_path, 'debug.log')
+        # Make sure we don't bother to mail admins if debug is True
+        if self.config.debug:
+            try:
+                self._settings['LOGGING']['loggers']['django.request']\
+                                            ['handlers'].remove('mail_admins')
+            except (KeyError, ValueError):
+                pass
 
     def adjust_databases(self):
         "Adjusts database settings"
