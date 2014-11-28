@@ -90,7 +90,9 @@ class BaseInstallationHandler(object):
         """Builds the settings into self._settings,
         and makes any adjustments."""
         self.import_initial()
+        self.pre_adjust()
         self.adjust()
+        self.post_adjust()
 
     def import_initial(self):
         "Imports the initial settings into self._settings"
@@ -98,13 +100,20 @@ class BaseInstallationHandler(object):
         project = import_module(self.project_module)
         self._settings = settings_from_module(project)
 
-    def adjust(self):
-        "Adjusts the settings"
+    def pre_adjust(self):
+        "Runs before adjust()."
         # Pull any secret settings from the secret module
         # This file should not be in the main code repository
         secret = settings_from_module(import_module('settings.secret'))
         self._settings.update(secret)
 
+    def adjust(self):
+        """Add settings based on self.config.
+        Intended to be overridden."""
+        pass
+
+    def post_adjust(self):
+        "Runs after adjust()."
         # Process the extra_settings kwarg
         self._settings.update(self.config.extra_settings)
 
@@ -164,6 +173,8 @@ class InstallationHandler(BaseInstallationHandler):
     def adjust(self):
         "Adjusts the settings"
 
+        super(InstallationHandler, self).adjust()
+
         self._settings['ALLOWED_HOSTS'] = [self.config.domain]
         self._settings['DOMAIN'] = self.config.domain
         self._settings['STATIC_ROOT'] = self.config.static_path
@@ -177,8 +188,6 @@ class InstallationHandler(BaseInstallationHandler):
         self.adjust_logging()
         self.adjust_databases()
         self.adjust_email()
-
-        super(InstallationHandler, self).adjust()
 
 
     def adjust_debug(self):
